@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+    <link rel="stylesheet" href="./src/index.css" />
+    <style>
+      body {
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebCodecsPlayer</h1>
+    <div id="player"></div>
+    <input id="input" type="text">
+    <div>
+      <button id="btn">start</button>
+      <button id="btn2">stop</button>
+    </div>
+    <script type="javascript/text">
+      播放器工作原理：
+        1.streamer(fetch拉取flv数据流: 视频为H.264编码);
+        2.demuxer(解析flv数据流为DemuxedSourceData解析数据);
+        3.decoder(调用WebCodecs把解析数据解码成VideoFrame);
+        4.render(将VideoFrame渲染至canvas上);
+
+      任务要求：
+        1.补全播放器代码(主要是在: /player/wcs.ts; /utils/decoder/webcodecs;)
+          a.尽量保持和使用类中已有的属性、方法，顶部的引用;(可根据实际情况调整，如觉得影响发挥请大胆重写)
+          b.补全Typescript;(非anyscript)
+          c.decoder使用Web Workers和WebCodecs视频解码技术;
+          d.只需处理视频部分;
+        2.在Chrome和Safari上能流畅稳定播放;
+        3.能通过局域网IP地址访问demo;
+        4.给出streamer里AbortController的兼容性polyfill;(附加题，非入侵式注入)
+
+      参考资料：
+        1.https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Workers_API
+        2.https://developer.mozilla.org/zh-CN/docs/Web/API/WebCodecs_API
+        3.https://zhuanlan.zhihu.com/p/590248553
+        4.https://zhuanlan.zhihu.com/p/623271636
+        5.https://github.com/bilibili/flv.js
+      
+      友情提示：
+        1.demuxer解析出的数据DemuxedSourceData只包含裸流数据, VideoMeta里包含spspps(SPS + PPS)数据;
+        2.webcodecs解码关键帧需要完整的数据(I帧包含了SPS, PPS, I条带。tip: [...spspps数据,...裸流数据]);
+        3.任务如果有不清楚的地方请及时联系hr;
+    </script>
+    <script type="module">
+      import Player from '/src/player/index.ts'
+
+      const $input = document.getElementById('input')
+      $input.value = '' // 可用的H.264_flv流, eg: https://******.flv
+      const $btn = document.getElementById('btn')
+      const $btn2 = document.getElementById('btn2')
+      const player = new Player.wcs()
+      player.init({
+        renderId: 'player',
+        buffer: 1000
+      })
+      $btn.onclick = () => {
+        player.start($input.value)
+      }
+      $btn2.onclick = () => {
+        player.stop()
+      }
+    </script>
+  </body>
+</html>
