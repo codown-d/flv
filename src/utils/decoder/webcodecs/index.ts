@@ -25,10 +25,10 @@ export default class Decoder {
         this.videoDecoder = new VideoDecoder(); // 实例化视频解码器
         console.log("videoDecoder", this.videoDecoder)
         // 设置工作线程消息处理
-        this.videoDecoder.onmessage = (event: MessageEvent<PostMessageEventMap>) => {
-          const { type, value } = event.data;
-          this.onMessage(type, value); // 处理来自工作线程的消息
-        };
+        // this.videoDecoder.onMessage = (event) => {
+        //   const { type, value } = event.data;
+        //   this.onMessage(type, value); // 处理来自工作线程的解码数据
+        // };
   
         // 发送配置到工作线程
         const config = {
@@ -36,7 +36,7 @@ export default class Decoder {
           offscreen: new OffscreenCanvas(640, 480), // 创建 OffscreenCanvas
           spspps: new Uint8Array(), // 替换为实际的 SPS/PPS 数据
         };
-        this.videoDecoder.postMessage({ type: 'configure', value: config }); // 配置工作线程
+        this.videoDecoder.onMessage('configure', config); // 配置工作线程
       }
     }
   }
@@ -46,7 +46,7 @@ export default class Decoder {
         {
           // code
           if (this.videoDecoder) {
-            this.videoDecoder.decode(data); // 使用工作线程解码视频数据
+            this.videoDecoder.postMessage('decode', data); // 使用工作线程解码视频数据
           }
           break;
         }
@@ -58,14 +58,17 @@ export default class Decoder {
       case "video":
         {
           // code
-          // code
           if (this.videoDecoder) {
-            this.videoDecoder.configure({
+            const offscreenCanvas = new OffscreenCanvas(640, 480); // 创建 OffscreenCanvas
+            const spspps = new Uint8Array(data.spspps); // 确保 SPS/PPS 数据的有效性
+            this.videoDecoder.postMessage('configure',{
               // 配置视频解码器
               codec: data.codec,
               codedWidth: data.codecWidth,
               codedHeight: data.codecHeight,
-              description: data.spspps, // 假设这是 SPS/PPS 数据
+              // description: data.spspps, // 假设这是 SPS/PPS 数据
+              description: spspps, // 使用有效的 SPS/PPS 数据
+              offscreen: offscreenCanvas // 传递 OffscreenCanvas
             });
           }
           break;
@@ -88,11 +91,11 @@ export default class Decoder {
     // code
     // 停止工作线程和解码器
     if (this.videoDecoder) {
-      this.videoDecoder.stop(); // 停止视频解码器
+      // this.videoDecoder.terminate(); // 停止工作线程
     }
     // 如果有音频解码器，也需要停止
     if (this.audioDecoder) {
-      this.audioDecoder.stop(); // 停止音频解码器
+      // this.audioDecoder.stop(); // 停止音频解码器
     }
   }
 }

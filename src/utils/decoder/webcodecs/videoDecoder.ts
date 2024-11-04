@@ -52,6 +52,7 @@ export class VideoWorkerDecoder {
             console.error("Decoder error:", e);
           },
         });
+        console.log('SPS/PPS length:', value.spspps.length);
         // 配置解码器
         this.decoder.configure({
           codec: "avc1.64001E", // H.264 编码
