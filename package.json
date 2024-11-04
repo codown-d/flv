@@ -12,5 +12,8 @@
     "@types/node": "^22.5.5",
     "typescript": "^5.5.3",
     "vite": "^5.4.1"
+  },
+  "dependencies": {
+    "flv.js": "^1.6.2"
   }
 }

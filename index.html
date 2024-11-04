@@ -49,24 +49,6 @@
         2.webcodecs解码关键帧需要完整的数据(I帧包含了SPS, PPS, I条带。tip: [...spspps数据,...裸流数据]);
         3.任务如果有不清楚的地方请及时联系hr;
     </script>
-    <script type="module">
-      import Player from '/src/player/index.ts'
-
-      const $input = document.getElementById('input')
-      $input.value = '' // 可用的H.264_flv流, eg: https://******.flv
-      const $btn = document.getElementById('btn')
-      const $btn2 = document.getElementById('btn2')
-      const player = new Player.wcs()
-      player.init({
-        renderId: 'player',
-        buffer: 1000
-      })
-      $btn.onclick = () => {
-        player.start($input.value)
-      }
-      $btn2.onclick = () => {
-        player.stop()
-      }
-    </script>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
